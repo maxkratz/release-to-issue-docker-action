@@ -1,0 +1,18 @@
+# action.yml
+name: 'Release to issue'
+description: 'Create a new issue in your GitHub repository based on new releases of other GitHub repositories.'
+inputs:
+  repo-to-check:
+    description: 'Which repo to check for new releases'
+    required: true
+    default: 'maxkratz/release-to-issue-docker-action'
+  start-date:
+    description: 'Date limit to ignore older releases'
+    required: true
+    default: '2025-01-01'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.repo-to-check }}
+    - ${{ inputs.start-date }}
