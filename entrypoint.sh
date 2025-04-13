@@ -25,7 +25,7 @@ echo "password=$GITHUB_TOKEN" > /github.properties
 JAR=release-to-issue-java-*-jar-with-dependencies.jar
 
 # Run Java program
-if [ "$DRY_RUN" -eq "1" ]; then
+if [ "$DRY_RUN" = "true" ]; then
   echo "Running dry."
   java -jar $JAR --sourcerepo $SOURCE_REPO --targetrepo $TARGET_REPO --datelimit $START_DATE --assignee $ASSIGNEE --dryrun
 else
