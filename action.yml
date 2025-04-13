@@ -8,8 +8,7 @@ inputs:
     default: 'maxkratz/release-to-issue-docker-action'
   target-repo:
     description: 'Which repo to check for new releases'
-    required: false
-    default: 'context'
+    required: true
   start-date:
     description: 'Date limit to ignore older releases'
     required: true
@@ -23,6 +22,10 @@ inputs:
   github-token:
     description: 'Which GitHub token should be used to query the GitHub API'
     required: true
+  dry-run:
+    description: 'If true, the Action will not create any issues but just simulate them'
+    require: false
+    default: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -33,3 +36,4 @@ runs:
     - ${{ inputs.assignee-name }}
     - ${{ inputs.github-username }}
     - ${{ inputs.github-token }}
+    - ${{ inputs.dry-run }}
