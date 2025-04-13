@@ -1,0 +1,39 @@
+# action.yml
+name: 'Release to issue'
+description: 'Create a new issue in your GitHub repository based on new releases of other GitHub repositories.'
+inputs:
+  source-repo:
+    description: 'Which repo to check for new releases'
+    required: true
+    default: 'maxkratz/release-to-issue-docker-action'
+  target-repo:
+    description: 'Which repo to check for new releases'
+    required: true
+  start-date:
+    description: 'Date limit to ignore older releases'
+    required: true
+    default: '2025-01-01'
+  assignee-name:
+    description: 'Which GitHub user should be assigned to newly created issues'
+    required: true
+  github-username:
+    description: 'Which GitHub user should be used to query the GitHub API'
+    required: true
+  github-token:
+    description: 'Which GitHub token should be used to query the GitHub API'
+    required: true
+  dry-run:
+    description: 'If true, the Action will not create any issues but just simulate them'
+    require: false
+    default: false
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.source-repo }}
+    - ${{ inputs.target-repo }}
+    - ${{ inputs.start-date }}
+    - ${{ inputs.assignee-name }}
+    - ${{ inputs.github-username }}
+    - ${{ inputs.github-token }}
+    - ${{ inputs.dry-run }}
