@@ -9,23 +9,20 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Formatter;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-public class ExampleRunner {
+public class ReleaseToIssue {
 
     private final static String GITHUB_URL = "https://github.com/";
-    private final String sourceRepoName = "lectureStudio/lectureStudio";
-    private final String targetRepoName = "maxkratz/github-api-testing";
-    private final String dateLimit = "2023-01-01";
-    private final String assigneeName = "maxkratz";
-    private final boolean dryRun = false;
-    private final String propertiesFilePath = "./github.properties";
+    private final Logger logger = Logger.getLogger(ReleaseToIssue.class.getName());
+    private String sourceRepoName = "lectureStudio/lectureStudio";
+    private String targetRepoName = "maxkratz/github-api-testing";
+    private String dateLimit = "2023-01-01";
+    private String assigneeName = "maxkratz";
+    private boolean dryRun = false;
+    private String propertiesFilePath = "./github.properties";
 
-    private final Logger logger = Logger.getLogger(ExampleRunner.class.getName());
-
-    public ExampleRunner() {
+    public ReleaseToIssue() {
         // Configure logging
         logger.setUseParentHandlers(false);
         final ConsoleHandler handler = new ConsoleHandler();
@@ -34,7 +31,22 @@ public class ExampleRunner {
     }
 
     public static void main(final String[] args) {
-        new ExampleRunner().run();
+        new ReleaseToIssue().run();
+    }
+
+    public void run(final Configuration config) {
+        // Save configuration values
+        this.sourceRepoName = config.sourceRepoName();
+        this.targetRepoName = config.targetRepoName();
+        this.dateLimit = config.dateLimit();
+        this.assigneeName = config.assigneeName();
+        this.dryRun = config.dryRun();
+        if (config.propertiesFilePath() != null) {
+            this.propertiesFilePath = config.propertiesFilePath();
+        }
+
+        // Run
+        run();
     }
 
     public void run() {
@@ -206,18 +218,6 @@ public class ExampleRunner {
                 }
             }
         }
-    }
-
-    private static class LogEntryFormatter extends Formatter {
-
-        @Override
-        public String format(final LogRecord record) {
-            if (record == null) {
-                throw new IllegalArgumentException("Given log entry was null.");
-            }
-            return record.getMessage() + System.lineSeparator();
-        }
-
     }
 
 }
