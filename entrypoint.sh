@@ -18,8 +18,8 @@ fi
 echo "Dry run: $DRY_RUN"
 
 # Create tmp file with GitHub credentials
-echo "login=$GITHUB_USERNAME" > /github.properties
-echo "password=$GITHUB_TOKEN" > /github.properties
+echo "login=$GITHUB_USERNAME" >> /github.properties
+echo "password=$GITHUB_TOKEN" >> /github.properties
 
 # Determin JAR file name
 JAR=/release-to-issue-java-*-jar-with-dependencies.jar
