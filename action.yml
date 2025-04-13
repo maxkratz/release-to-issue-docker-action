@@ -7,7 +7,7 @@ inputs:
     required: true
     default: 'maxkratz/release-to-issue-docker-action'
   target-repo:
-    description: 'Which repo to check for new releases'
+    description: 'Which repo to create new issues in'
     required: true
   start-date:
     description: 'Date limit to ignore older releases'
