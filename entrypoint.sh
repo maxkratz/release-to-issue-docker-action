@@ -22,7 +22,7 @@ echo "login=$GITHUB_USERNAME" > /github.properties
 echo "password=$GITHUB_TOKEN" > /github.properties
 
 # Determin JAR file name
-JAR=release-to-issue-java-*-jar-with-dependencies.jar
+JAR=/release-to-issue-java-*-jar-with-dependencies.jar
 
 # Run Java program
 if [ "$DRY_RUN" = "true" ]; then
