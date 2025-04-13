@@ -18,19 +18,19 @@ fi
 echo "Dry run: $DRY_RUN"
 
 # Create tmp file with GitHub credentials
-echo "login=$GITHUB_USERNAME" > /github.properties
-echo "password=$GITHUB_TOKEN" > /github.properties
+echo "login=$GITHUB_USERNAME" >> /github.properties
+echo "password=$GITHUB_TOKEN" >> /github.properties
 
 # Determin JAR file name
-JAR=release-to-issue-java-*-jar-with-dependencies.jar
+JAR=/release-to-issue-java-*-jar-with-dependencies.jar
 
 # Run Java program
-if [ "$DRY_RUN" -eq "1" ]; then
+if [ "$DRY_RUN" = "true" ]; then
   echo "Running dry."
-  java -jar $JAR --sourcerepo $SOURCE_REPO --targetrepo $TARGET_REPO --datelimit $START_DATE --assignee $ASSIGNEE --dryrun
+  java -jar $JAR --sourcerepo $SOURCE_REPO --targetrepo $TARGET_REPO --datelimit $START_DATE --assignee $ASSIGNEE --properties /github.properties --dryrun
 else
   echo "Running wet."
-  java -jar $JAR --sourcerepo $SOURCE_REPO --targetrepo $TARGET_REPO --datelimit $START_DATE --assignee $ASSIGNEE
+  java -jar $JAR --sourcerepo $SOURCE_REPO --targetrepo $TARGET_REPO --datelimit $START_DATE --assignee $ASSIGNEE --properties /github.properties
 fi
 
 # Delete tmp file with GitHub credentials
