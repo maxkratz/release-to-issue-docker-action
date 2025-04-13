@@ -8,6 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class ExampleRunner {
 
@@ -16,6 +20,18 @@ public class ExampleRunner {
     private final String targetRepoName = "maxkratz/github-api-testing";
     private final String dateLimit = "2023-01-01";
     private final String assigneeName = "maxkratz";
+    private final boolean dryRun = false;
+    private final String propertiesFilePath = "./github.properties";
+
+    private final Logger logger = Logger.getLogger(ExampleRunner.class.getName());
+
+    public ExampleRunner() {
+        // Configure logging
+        logger.setUseParentHandlers(false);
+        final ConsoleHandler handler = new ConsoleHandler();
+        handler.setFormatter(new LogEntryFormatter());
+        logger.addHandler(handler);
+    }
 
     public static void main(final String[] args) {
         new ExampleRunner().run();
@@ -24,25 +40,36 @@ public class ExampleRunner {
     public void run() {
         GitHub github = null;
         try {
-            github = GitHubBuilder.fromPropertyFile("./github.properties").build();
+            github = GitHubBuilder.fromPropertyFile(propertiesFilePath).build();
         } catch (final IOException e) {
-            throw new RuntimeException("GitHub auth failed: " + e);
+            logger.warning("GitHub auth failed.");
+            throw new RuntimeException(e);
         }
 
+        checkNotNull(github);
+
+        // Get all releases of the source repository
         final Set<GHRelease> allSourceReleases = getAllReleases(github, sourceRepoName);
+
+        // Get all issues of the target repository
         final Set<GHIssue> allTargetIssues = getAllTargetIssues(github, targetRepoName);
 
+        // Determine which releases are new, i.e., which releases do not have a corresponding issue within the target repository
         final Set<GHRelease> newReleases = calculateNewReleases(github, allSourceReleases, sourceRepoName, allTargetIssues, dateLimit);
+
+        // Create a new issue for every new release
         createIssuesForReleases(github, newReleases, sourceRepoName, targetRepoName);
     }
 
     private void createIssuesForReleases(final GitHub github, final Set<GHRelease> releases, final String sourceRepoName, final String targetRepoName) {
+        checkNotNull(github, releases, sourceRepoName, targetRepoName);
         releases.forEach(r -> {
             createIssueForRelease(github, r, sourceRepoName, targetRepoName);
         });
     }
 
     private void createIssueForRelease(final GitHub github, final GHRelease release, final String sourceRepoName, final String targetRepoName) {
+        checkNotNull(github, release, sourceRepoName, targetRepoName);
         try {
             final GHRepository targetRepo = github.getRepository(targetRepoName);
             final String tagName = release.getTagName();
@@ -53,15 +80,18 @@ public class ExampleRunner {
                 issueBuilder.assignee("");
             }
 
-            //System.out.println("Would have created issue: " + issueBuilder.toString());
-            System.out.println("Create issue: " + constructIssueTitle(sourceRepoName, tagName));
-            //issueBuilder.create();
+            logger.info("Create issue: " + constructIssueTitle(sourceRepoName, tagName));
+            if (!dryRun) {
+                issueBuilder.create();
+            }
         } catch (final IOException e) {
+            logger.warning("Caught an exception while creating a new issue within the target repository.");
             throw new RuntimeException(e);
         }
     }
 
     private Set<GHRelease> calculateNewReleases(final GitHub github, final Set<GHRelease> allSourceReleases, final String sourceRepoName, final Set<GHIssue> allTargetIssues, final String dateLimit) {
+        checkNotNull(github, allSourceReleases, sourceRepoName, allTargetIssues, dateLimit);
         final Set<GHRelease> newReleases = new HashSet<>();
 
         for (final GHRelease currentRelease : allSourceReleases) {
@@ -69,6 +99,7 @@ public class ExampleRunner {
             final long epochLimit = convertDateToEpoch(dateLimit);
             final long epochRelease = currentRelease.getPublished_at().getTime();
             if (epochLimit > epochRelease) {
+                logger.info("Release with tag <" + currentRelease.getTagName() + "> violates specified date limit.");
                 continue;
             }
 
@@ -78,6 +109,7 @@ public class ExampleRunner {
             for (final GHIssue currentIssue : allTargetIssues) {
                 if (currentIssue.getTitle().equals(constructIssueTitle(sourceRepoName, currentRelease.getTagName()))) {
                     found = true;
+                    logger.info("Target issue <" + currentIssue.getTitle() + "> already exists.");
                     break;
                 }
             }
@@ -90,6 +122,7 @@ public class ExampleRunner {
     }
 
     private Set<GHRelease> getAllReleases(final GitHub github, final String sourceRepoName) {
+        checkNotNull(github, sourceRepoName);
         final Set<GHRelease> allReleases = new HashSet<>();
 
         try {
@@ -100,6 +133,7 @@ public class ExampleRunner {
                 }
             });
         } catch (final IOException e) {
+            logger.warning("Exception caught while getting releases of the source repository.");
             throw new RuntimeException(e);
         }
 
@@ -107,12 +141,14 @@ public class ExampleRunner {
     }
 
     private Set<GHIssue> getAllTargetIssues(final GitHub github, final String targetRepoName) {
+        checkNotNull(github, targetRepoName);
         final Set<GHIssue> allIssues;
 
         try {
             final GHRepository targetRepo = github.getRepository(targetRepoName);
             allIssues = new HashSet<>(targetRepo.getIssues(GHIssueState.ALL));
         } catch (final IOException e) {
+            logger.warning("Exception caught while getting issues of the target repository.");
             throw new RuntimeException(e);
         }
 
@@ -124,37 +160,64 @@ public class ExampleRunner {
     //
 
     private long convertDateToEpoch(final String date) {
+        checkNotNull(date);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-dd-MM");
         try {
-            Date d = df.parse(date);
+            final Date d = df.parse(date);
+            checkNotNull(d);
             return d.getTime();
         } catch (final ParseException e) {
+            logger.warning("ParseException caught while parsing the date <" + date + ">.");
             throw new RuntimeException(e);
         }
     }
 
     private String constructIssueTitle(final String repoName, final String version) {
+        checkNotNull(repoName, version);
         return "Update " + repoName.split("/")[1] + " to " + version;
     }
 
     private String constructIssueBody(final String repoName, final String tag) {
+        checkNotNull(repoName, tag);
         return "- GitHub release: " + constructReleaseUrl(repoName, tag) //
                 + System.lineSeparator() //
                 + "- GitHub tag: " + constructTagUrl(repoName, tag);
     }
 
     private String constructTagUrl(final String repoName, final String tag) {
+        checkNotNull(repoName, tag);
         return GITHUB_URL + repoName + "/tree/" + tag;
     }
 
     private String constructReleaseUrl(final String repoName, final String tag) {
+        checkNotNull(repoName, tag);
         return GITHUB_URL + repoName + "/releases/tag/" + tag;
     }
 
-    private void checkNotNull(final Object object) {
-        if (object == null) {
+    private void checkNotNull(final Object... objects) {
+        if (objects == null) {
             throw new IllegalArgumentException("Parameter was null.");
         }
+
+        if (objects.length > 0) {
+            for (int i = 0; i < objects.length; i++) {
+                if (objects[i] == null) {
+                    throw new IllegalArgumentException("Parameter <" + i + "> was null.");
+                }
+            }
+        }
+    }
+
+    private static class LogEntryFormatter extends Formatter {
+
+        @Override
+        public String format(final LogRecord record) {
+            if (record == null) {
+                throw new IllegalArgumentException("Given log entry was null.");
+            }
+            return record.getMessage() + System.lineSeparator();
+        }
+
     }
 
 }
