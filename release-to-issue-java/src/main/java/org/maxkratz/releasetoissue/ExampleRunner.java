@@ -1,4 +1,4 @@
-package org.example;
+package org.maxkratz.releasetoissue;
 
 import org.kohsuke.github.*;
 
