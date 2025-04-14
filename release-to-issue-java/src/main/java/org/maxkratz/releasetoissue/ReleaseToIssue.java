@@ -70,18 +70,18 @@ public class ReleaseToIssue {
         final Set<GHRelease> newReleases = calculateNewReleases(github, allSourceReleases, sourceRepoName, allTargetIssues, dateLimit);
 
         // Create a new issue for every new release
-        createIssuesForReleases(github, newReleases, sourceRepoName, targetRepoName);
+        createIssuesForReleases(github, newReleases, sourceRepoName, targetRepoName, assigneeName);
     }
 
-    private void createIssuesForReleases(final GitHub github, final Set<GHRelease> releases, final String sourceRepoName, final String targetRepoName) {
-        checkNotNull(github, releases, sourceRepoName, targetRepoName);
+    private void createIssuesForReleases(final GitHub github, final Set<GHRelease> releases, final String sourceRepoName, final String targetRepoName, final String assigneeName) {
+        checkNotNull(github, releases, sourceRepoName, targetRepoName, assigneeName);
         releases.forEach(r -> {
-            createIssueForRelease(github, r, sourceRepoName, targetRepoName);
+            createIssueForRelease(github, r, sourceRepoName, targetRepoName, assigneeName);
         });
     }
 
-    private void createIssueForRelease(final GitHub github, final GHRelease release, final String sourceRepoName, final String targetRepoName) {
-        checkNotNull(github, release, sourceRepoName, targetRepoName);
+    private void createIssueForRelease(final GitHub github, final GHRelease release, final String sourceRepoName, final String targetRepoName, final String assigneeName) {
+        checkNotNull(github, release, sourceRepoName, targetRepoName, assigneeName);
         try {
             final GHRepository targetRepo = github.getRepository(targetRepoName);
             final String tagName = release.getTagName();
@@ -89,7 +89,7 @@ public class ReleaseToIssue {
             issueBuilder.body(constructIssueBody(sourceRepoName, tagName));
             issueBuilder.label("enhancement");
             if (assigneeName != null && !assigneeName.isBlank()) {
-                issueBuilder.assignee("");
+                issueBuilder.assignee(assigneeName);
             }
 
             logger.info("Create issue: " + constructIssueTitle(sourceRepoName, tagName));
