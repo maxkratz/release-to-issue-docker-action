@@ -5,7 +5,7 @@
 
     <groupId>org.maxkratz</groupId>
     <artifactId>release-to-issue-java</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
