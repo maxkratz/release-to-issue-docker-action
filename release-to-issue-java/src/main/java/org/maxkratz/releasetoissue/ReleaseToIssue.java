@@ -173,7 +173,7 @@ public class ReleaseToIssue {
 
     private long convertDateToEpoch(final String date) {
         checkNotNull(date);
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-dd-MM");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         try {
             final Date d = df.parse(date);
             checkNotNull(d);
