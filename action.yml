@@ -24,8 +24,8 @@ inputs:
     required: true
   dry-run:
     description: 'If true, the Action will not create any issues but just simulate them'
-    require: false
-    default: false
+    required: false
+    default: 'false'
 runs:
   using: 'docker'
   image: 'Dockerfile'

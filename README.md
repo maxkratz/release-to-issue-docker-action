@@ -20,7 +20,7 @@ This GitHub Action also assignes a user and the tag `enhancement` to the newly c
     - Required: yes
 - `github-token`: Which GitHub token should be used to query the GitHub API
     - Required: yes
-- `dry-run`: If true, the Action will not create any issues but just simulate them
+- `dry-run`: If 'true', the Action will not create any issues but just simulate them
     - Required: no
 
 ## Outputs
