@@ -1,5 +1,5 @@
 # Build the application within Docker
-FROM maven:3.9.10-eclipse-temurin-21 AS build
+FROM maven:3.9.11-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY release-to-issue-java/pom.xml .
 COPY release-to-issue-java/src ./src
