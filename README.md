@@ -34,7 +34,7 @@ None.
 - Add the following snippet to your GitHub Actions configuration file:
 
 ```
-uses: maxkratz/release-to-issue-docker-action@v1.0.5
+uses: maxkratz/release-to-issue-docker-action@v1.0.6
 with:
     source-repo: 'lectureStudio/lectureStudio'  # the repo that should be checked for new releases
     target-repo: 'maxkratz/github-api-testing'  # the repo in which you want to open an issue
