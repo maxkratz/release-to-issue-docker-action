@@ -6,7 +6,7 @@ COPY release-to-issue-java/src ./src
 RUN mvn clean compile assembly:single -DskipTests
 
 # Base image and maintainer
-FROM openjdk:17
+FROM eclipse-temurin:17
 LABEL maintainer="Max Kratz <github@maxkratz.com>"
 
 COPY --from=build /app/target/release-to-issue-java-*-jar-with-dependencies.jar .
