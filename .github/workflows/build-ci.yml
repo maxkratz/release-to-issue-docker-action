@@ -26,7 +26,7 @@ jobs:
       - name: Set up Maven
         uses: stCarolas/setup-maven@v5.1
         with:
-          maven-version: 3.9.15
+          maven-version: 3.9.16
 
       # Build normal JAR
       - name: Build with Maven
