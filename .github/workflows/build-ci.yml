@@ -65,4 +65,5 @@ jobs:
           context: .
           push: false
           tags: maxkratz/release-to-issue
-          platforms: linux/amd64,linux/arm64
+          # Temporarily disable arm64 builds: ,linux/arm64
+          platforms: linux/amd64
