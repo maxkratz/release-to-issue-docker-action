@@ -26,7 +26,7 @@ jobs:
       - name: Set up Maven
         uses: stCarolas/setup-maven@v5.1
         with:
-          maven-version: 3.10.0
+          maven-version: 3.10.2
 
       # Build normal JAR
       - name: Build with Maven
@@ -65,4 +65,5 @@ jobs:
           context: .
           push: false
           tags: maxkratz/release-to-issue
-          platforms: linux/amd64,linux/arm64
+          # Temporarily disable arm64 builds: ,linux/arm64
+          platforms: linux/amd64
